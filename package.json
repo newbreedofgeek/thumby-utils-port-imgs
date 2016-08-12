@@ -1,0 +1,14 @@
+{
+  "name": "thumby-utils-port-imgs",
+  "version": "0.0.1",
+  "description": "this util script will let you post your images from an existign image server to thumby",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "@newbreedofgeek",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.74.0"
+  }
+}
