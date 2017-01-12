@@ -1,18 +1,66 @@
 var request = require('request');
+var JsonFile = require('jsonfile');
+var sleep = require('sleep');
+
+// config
+var sleepBetweenEachUpload = 10; // in seconds
+var thumbyThumbsCreateRoot = 'http://thumby.yoursite.com/thumbs/create'; // you thumby server url
+var batchFileName = 'data_unPublished_7.json'; // the json batch file to save, the image array obj needs to be in a "items" prop in that file's root
+// e.g format
+// "items": [
+//   {
+//     "img": "https://wisdomtoinspire-wisdom-imgs.s3.amazonaws.com/EJedKcTqee.jpg"
+//   },
+//   {
+//     "img": "https://wisdomtoinspire-wisdom-imgs.s3.amazonaws.com/VkeMcqT9lx.jpg"
+//   }
+// ]
 
 var fetchAndSave = function(url, cb) {
-  request.post({url:'http://localhost:7000/thumbs/create', formData: {
+  console.log('fetchAndSave: upload request sent for ' + url);
+
+  request.post({url:thumbyThumbsCreateRoot, formData: {
       attachments: [
         request.get(url)
       ]
     }}, function(err, res, body) {
       if (err) {
-        return console.error('upload failed:', err);
+        return console.error('fetchAndSave: upload failed on ' + url + ' err :', err);
       }
-      cb('Upload successful!  Server responded with: ' + body);
+      cb('fetchAndSave: Upload successful on ' + url + '!  Server responded with: ' + body);
   });
 };
 
-fetchAndSave('http://wisdomtoinspire-wisdom-imgs.s3.amazonaws.com/S1UNjneP.jpg', function(m) {
-  console.log(m);
-})
+function goSave(batchOfItems, firstItem) {
+  if (!firstItem) {
+    batchOfItems.shift();
+  }
+
+  if (batchOfItems.length > 0) {
+    var item = batchOfItems[0];
+    var nextImg = item.img.replace('https', 'http');
+    console.log('\nlets upload next item which is ' + nextImg);
+    console.log('...........');
+
+    fetchAndSave(nextImg, function(m) {
+      console.log(m);
+      console.log('...........');
+
+      sleep.sleep(sleepBetweenEachUpload);
+      goSave(batchOfItems);
+    })
+  }
+  else {
+    console.log('\nProcessing done\n');
+  }
+}
+
+function batchSave(batchFile) {
+  var batchOfItems = JsonFile.readFileSync(batchFile).items;
+
+  console.log('\nReady to start processing the batch of ' + batchOfItems.length + ' items\n');
+
+  goSave(batchOfItems, true);
+}
+
+batchSave(batchFileName); // start the batch upload

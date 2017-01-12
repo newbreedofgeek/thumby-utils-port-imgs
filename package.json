@@ -9,6 +9,8 @@
   "author": "@newbreedofgeek",
   "license": "ISC",
   "dependencies": {
-    "request": "^2.74.0"
+    "jsonfile": "^2.4.0",
+    "request": "^2.74.0",
+    "sleep": "^5.1.0"
   }
 }
