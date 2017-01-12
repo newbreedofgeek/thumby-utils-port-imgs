@@ -3,9 +3,9 @@ var JsonFile = require('jsonfile');
 var sleep = require('sleep');
 
 // config
-var sleepBetweenEachUpload = 10; // in seconds
-var thumbyThumbsCreateRoot = 'http://thumby.yoursite.com/thumbs/create'; // you thumby server url
-var batchFileName = 'data_unPublished_7.json'; // the json batch file to save, the image array obj needs to be in a "items" prop in that file's root
+var sleepBetweenEachUpload = 3; // in seconds
+var thumbyThumbsCreateRoot = 'http://thumby.yourhost.com/thumbs/create'; // you thumby server url
+var batchFileName = 'datafiles/data_published_0.json'; // the json batch file to save, the image array obj needs to be in a "items" prop in that file's root
 // e.g format
 // "items": [
 //   {
@@ -39,7 +39,7 @@ function goSave(batchOfItems, firstItem) {
   if (batchOfItems.length > 0) {
     var item = batchOfItems[0];
     var nextImg = item.img.replace('https', 'http');
-    console.log('\nlets upload next item which is ' + nextImg);
+    console.log('\n# '+(++imgIndex)+' lets upload next item which is ' + nextImg);
     console.log('...........');
 
     fetchAndSave(nextImg, function(m) {
@@ -63,4 +63,5 @@ function batchSave(batchFile) {
   goSave(batchOfItems, true);
 }
 
+var imgIndex = 0;
 batchSave(batchFileName); // start the batch upload
